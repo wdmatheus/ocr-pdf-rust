@@ -1,0 +1,15 @@
+
+services:
+  pdf-ocr-api-rust:
+    container_name: pdf-ocr-api-rust
+    image: pdf-ocr-api-rust
+    network_mode: host
+    build:
+      context: .
+      target: final
+
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '8GB'

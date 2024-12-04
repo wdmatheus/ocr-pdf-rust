@@ -1,0 +1,9 @@
+[workspace]
+
+members = [
+    "api",
+    "console_app",
+    "ocr_pdf"
+]
+
+resolver = "2"

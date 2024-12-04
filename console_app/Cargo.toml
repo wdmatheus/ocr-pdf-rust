@@ -1,0 +1,8 @@
+[package]
+name = "console_app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ocr_pdf = { path = "../ocr_pdf" }
+tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }

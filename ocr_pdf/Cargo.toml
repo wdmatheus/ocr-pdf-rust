@@ -1,0 +1,10 @@
+[package]
+name = "ocr_pdf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ocrmypdf-rs = "0.0.8"
+serde = { version = "1.0.215", features = ["derive"] }
+tokio = { version = "1.42.0", features = ["fs", "rt-multi-thread"] }
+uuid = { version = "1.11.0", features = ["v4"] }
