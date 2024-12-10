@@ -57,7 +57,7 @@ async fn main() {
 }
 
 async fn extract_text_from_pdf(
-    mut multipart: Multipart,
+    mut multipart: Multipart
 ) -> impl IntoResponse {
     let mut buffer: Vec<u8> = Vec::new();
     let mut total: u8 = 0;
@@ -83,7 +83,7 @@ async fn extract_text_from_pdf(
 
     match OcrProcessor.extract_text_from_buffer(&buffer).await {
         Ok(ocr) => Ok(Json(ocr)),
-        Err(e) => Err(ErrorResponse::new(&format!("Error extracting text: {}", e)).into_response()),
+        Err(e) => Err(ErrorResponse::new(&e).into_response()),
     }
 }
 

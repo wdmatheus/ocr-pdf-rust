@@ -9,12 +9,12 @@ impl OcrProcessor {
     pub async fn extract_text_from_buffer(
         &self,
         buffer: &[u8],
-    ) -> Result<OcrResult, Box<dyn std::error::Error>> {
+    ) -> Result<OcrResult, String> {
         let dirname = "./dest-files";
 
         match tokio::fs::create_dir_all(dirname).await {
             Ok(_) => {}
-            Err(e) => return Err(format!("Error creating directory: {}", e).into()),
+            Err(e) => return Err(format!("Error creating directory: {}", e)),
         };
 
         let prefix = format!("./{}/{}", dirname, Uuid::new_v4());
@@ -24,7 +24,7 @@ impl OcrProcessor {
         let save_pdf = tokio::fs::write(&pdf_path, buffer).await;
 
         if save_pdf.is_err() {
-            return Err(format!("Error saving PDF: {}", save_pdf.err().unwrap()).into());
+            return Err(format!("Error saving PDF: {}", save_pdf.err().unwrap()));
         }
 
         self.extract_text_from_pdf(&pdf_path, &prefix).await
@@ -34,7 +34,7 @@ impl OcrProcessor {
         &self,
         input_path: &str,
         prefix: &str,
-    ) -> Result<OcrResult, Box<dyn std::error::Error>> {
+    ) -> Result<OcrResult, String> {
         let output_pdf = format!("./{}.pdf", &prefix);
         let output_txt = format!("./{}.txt", &prefix);
 
@@ -45,7 +45,7 @@ impl OcrProcessor {
             "--optimize=0".into(),
             "--tesseract-timeout=60".into(),
             "--force-ocr".into(),
-            "--jobs=1".into(),
+            "--jobs=2".into(),
             "--output-type=pdf".into(),
             "--pdf-renderer=sandwich".into(),
             "--sidecar".into(),
@@ -54,7 +54,7 @@ impl OcrProcessor {
 
         match  ocr_my_pdf::do_ocr(&args, &input_path.to_owned(),&output_pdf).await{
             Ok(_) => {}
-            Err(e) => return Err(format!("{}", e).into()),
+            Err(e) => return Err(format!("{}", e)),
         };
 
         match tokio::fs::read_to_string(&output_txt).await {
@@ -63,7 +63,7 @@ impl OcrProcessor {
                     .await;
                 Ok(OcrResult::new(content))
             }
-            Err(e) => Err(format!("Error reading OCR output: {}", e).into()),
+            Err(e) => Err(format!("Error reading OCR output: {}", e)),
         }
     }
 
