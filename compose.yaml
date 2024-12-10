@@ -6,6 +6,7 @@ services:
     network_mode: host
     build:
       context: .
+      #dockerfile: ./Dockerfile-amd64
       target: final
 
     deploy:
