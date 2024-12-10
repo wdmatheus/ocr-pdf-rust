@@ -20,7 +20,7 @@ async fn main() {
     //let state = Arc::new(OcrProcessor);
 
     let app = Router::new()
-        .route("/orc-pdf", post(extract_text_from_pdf))
+        .route("/ocr-pdf", post(extract_text_from_pdf))
         .layer(axum::middleware::from_fn(uri_middleware))
         .layer(
             TraceLayer::new_for_http()
