@@ -1,15 +1,12 @@
-use uuid::Uuid;
 use crate::models::OcrResult;
 use crate::ocr_my_pdf;
+use uuid::Uuid;
 
 #[derive(Default)]
 pub struct OcrProcessor;
 
 impl OcrProcessor {
-    pub async fn extract_text_from_buffer(
-        &self,
-        buffer: &[u8],
-    ) -> Result<OcrResult, String> {
+    pub async fn extract_text_from_buffer(&self, buffer: &[u8]) -> Result<OcrResult, String> {
         let dirname = "./dest-files";
 
         match tokio::fs::create_dir_all(dirname).await {
@@ -45,14 +42,14 @@ impl OcrProcessor {
             "--optimize=0".into(),
             "--tesseract-timeout=60".into(),
             "--force-ocr".into(),
-            "--jobs=2".into(),
+            "--jobs=1".into(),
             "--output-type=pdf".into(),
             "--pdf-renderer=sandwich".into(),
             "--sidecar".into(),
             output_txt.clone(),
         ];
 
-        match  ocr_my_pdf::do_ocr(&args, &input_path.to_owned(),&output_pdf).await{
+        match ocr_my_pdf::do_ocr(&args, &input_path.to_owned(), &output_pdf).await {
             Ok(_) => {}
             Err(e) => return Err(format!("{}", e)),
         };

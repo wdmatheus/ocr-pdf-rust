@@ -32,8 +32,6 @@ FROM debian:bookworm-slim AS final
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ocrmypdf tesseract-ocr-por
-
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
 ARG UID=10001
@@ -44,9 +42,11 @@ RUN adduser \
     --shell "/sbin/nologin" \
     --no-create-home \
     --uid "${UID}" \
-    appuser
-
-RUN chown -R appuser:appuser /app
+    appuser && \
+    chown -R appuser:appuser /app && \
+    apt-get update --no-install-recommends && \
+    apt-get install -y ocrmypdf tesseract-ocr-por --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 
 USER appuser
 
