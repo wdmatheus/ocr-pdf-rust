@@ -4,7 +4,7 @@ ARG RUST_VERSION=1.83.0
 # Create a stage for building the application.
 
 FROM rust:${RUST_VERSION}-alpine AS build
-
+ENV RUSTFLAGS="-C target-feature=+neon"
 WORKDIR /app
 
 # Install host build dependencies.
