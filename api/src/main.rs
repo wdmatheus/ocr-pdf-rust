@@ -1,28 +1,29 @@
+use axum::http::StatusCode;
 use axum::{
     extract::Multipart,
     response::{IntoResponse, Response},
     routing::post,
     Json, Router,
 };
-
 use ocr_pdf::ocr_processor::OcrProcessor;
 use serde::Serialize;
-
+use tower::{ServiceBuilder};
+use tower_http::{compression::CompressionLayer};
 
 #[tokio::main]
 async fn main() {
-    
-    let app = Router::new()
-        .route("/ocr-pdf", post(extract_text_from_pdf));
+    let app = Router::new().route("/ocr-pdf", post(extract_text_from_pdf))
+        .layer(
+            ServiceBuilder::new()                
+                .layer(CompressionLayer::new())
+        );
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();
 
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn extract_text_from_pdf(
-    mut multipart: Multipart
-) -> impl IntoResponse {
+async fn extract_text_from_pdf(mut multipart: Multipart) -> impl IntoResponse {
     let mut buffer: Vec<u8> = Vec::new();
     let mut total: u8 = 0;
 
@@ -41,10 +42,10 @@ async fn extract_text_from_pdf(
                 )
             }
         };
-    };
-  
+    }
+
     match OcrProcessor.extract_text_from_buffer(&buffer).await {
-        Ok(ocr) => Ok(Json(ocr)),
+        Ok(ocr) => Ok((StatusCode::OK, [("content-type", "text/plain")], ocr)),
         Err(e) => Err(ErrorResponse::new(&e).into_response()),
     }
 }
@@ -67,4 +68,3 @@ impl IntoResponse for ErrorResponse {
         (axum::http::StatusCode::BAD_REQUEST, Json(self)).into_response()
     }
 }
-
