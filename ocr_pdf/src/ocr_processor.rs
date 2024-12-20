@@ -1,11 +1,12 @@
 use crate::ocr_my_pdf;
 use uuid::Uuid;
+use crate::models::OcrResult;
 
 #[derive(Default)]
 pub struct OcrProcessor;
 
 impl OcrProcessor {
-    pub async fn extract_text_from_buffer(&self, buffer: &[u8]) -> Result<Vec<u8>, String> {
+    pub async fn extract_text_from_buffer(&self, buffer: &[u8]) -> Result<OcrResult, String> {
         let dirname = "./dest-files";
 
         match tokio::fs::create_dir_all(dirname).await {
@@ -30,7 +31,7 @@ impl OcrProcessor {
         &self,
         input_path: &str,
         prefix: &str,
-    ) -> Result<Vec<u8>, String> {
+    ) -> Result<OcrResult, String> {
         let output_pdf = format!("./{}.pdf", &prefix);
         let output_txt = format!("./{}.txt", &prefix);
 
@@ -53,11 +54,11 @@ impl OcrProcessor {
             Err(e) => return Err(format!("{}", e)),
         };
 
-        match tokio::fs::read(&output_txt).await {
+        match tokio::fs::read_to_string(&output_txt).await {
             Ok(content) => {
                 self.remove_temp_files(vec![input_path, &output_pdf, &output_txt])
                     .await;
-                Ok(content)
+                Ok(OcrResult::new(content))
             }
             Err(e) => Err(format!("Error reading OCR output: {}", e)),
         }

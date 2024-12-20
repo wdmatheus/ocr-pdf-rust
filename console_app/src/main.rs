@@ -6,7 +6,7 @@ async fn main() {
     let ocr_processor = ocr_pdf::ocr_processor::OcrProcessor;
 
     match ocr_processor.extract_text_from_buffer(&buffer).await {
-        Ok(ocr) => println!("{}", String::from_utf8_lossy(&ocr)),
+        Ok(ocr) => println!("{}", ocr.content),
         Err(e) => println!("{}", e),
     }
 }

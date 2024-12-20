@@ -45,7 +45,7 @@ async fn extract_text_from_pdf(mut multipart: Multipart) -> impl IntoResponse {
     }
 
     match OcrProcessor.extract_text_from_buffer(&buffer).await {
-        Ok(ocr) => Ok((StatusCode::OK, [("content-type", "text/plain")], ocr)),
+        Ok(ocr) => Ok(Json(ocr)),
         Err(e) => Err(ErrorResponse::new(&e).into_response()),
     }
 }
@@ -65,6 +65,7 @@ impl ErrorResponse {
 
 impl IntoResponse for ErrorResponse {
     fn into_response(self) -> Response {
-        (axum::http::StatusCode::BAD_REQUEST, Json(self)).into_response()
+        (StatusCode::BAD_REQUEST, Json(self)).into_response()
     }
 }
+
